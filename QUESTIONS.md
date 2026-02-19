@@ -7,7 +7,7 @@ Here we have 3 questions related to the code base for you to answer. It is not a
 **Answer:**
 ```txt
 I don't see multiple implementation strategies, however I also note this file says there are 3 questions when there are only 2. Is it posisble some of this has changed over time?
-My personal preference to to use core JPA and Spring-JPA tools to manage database manipulation. It works well, is well documented, and is well understood by developers. 
+My personal preference is to use core JPA and Spring-JPA tools to manage database manipulation. It works well, is well documented, and is well understood by developers. 
 ```
 ----
 2. When it comes to API spec and endpoints handlers, we have an Open API yaml file for the `Warehouse` API from which we generate code, but for the other endpoints - `Product` and `Store` - we just coded directly everything. What would be your thoughts about what are the pros and cons of each approach and what would be your choice?
