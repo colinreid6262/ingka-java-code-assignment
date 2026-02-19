@@ -22,7 +22,6 @@ public class LocationGateway implements LocationResolver {
 
   @Override
   public Location resolveByIdentifier(String identifier) {
-    // TODO implement this method
-    throw new UnsupportedOperationException("Unimplemented method 'resolveByIdentifier'");
+    return locations.stream().filter(location -> location.identification.equals(identifier)).findFirst().orElseThrow();
   }
 }
