@@ -1,32 +1,36 @@
 package com.fulfilment.application.monolith.warehouses.adapters.restapi;
 
+import com.fulfilment.application.monolith.warehouses.WarehouseConverter;
+import com.fulfilment.application.monolith.warehouses.adapters.database.WarehouseRepository;
 import com.warehouse.api.WarehouseResource;
 import com.warehouse.api.beans.Warehouse;
+import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public class WarehouseResourceImpl implements WarehouseResource {
 
+  @Inject WarehouseRepository warehouseRepository;
+
   @Override
   public List<Warehouse> listAllWarehousesUnits() {
-    return List.of();
+    return warehouseRepository.findAll().stream().map(WarehouseConverter::toJsonWarehouse).toList();
   }
 
   @Override
   public Warehouse createANewWarehouseUnit(@NotNull Warehouse data) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'createANewWarehouseUnit'");
+    warehouseRepository.create(WarehouseConverter.toDomainWarehouse(data));
+    return data;
   }
 
   @Override
   public Warehouse getAWarehouseUnitByID(String id) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getAWarehouseUnitByID'");
+    return WarehouseConverter.toJsonWarehouse(warehouseRepository.findByBusinessUnitCode(id));
   }
 
   @Override
   public void archiveAWarehouseUnitByID(String id) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'archiveAWarehouseUnitByID'");
+    var toDelete = warehouseRepository.findByBusinessUnitCode(id);
+    warehouseRepository.remove(toDelete);
   }
 }
