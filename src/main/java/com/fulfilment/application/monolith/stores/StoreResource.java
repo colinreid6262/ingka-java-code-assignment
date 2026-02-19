@@ -2,6 +2,7 @@ package com.fulfilment.application.monolith.stores;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -55,7 +56,7 @@ public class StoreResource {
 
     store.persist();
 
-    legacyStoreManagerGateway.createStoreOnLegacySystem(store);
+    legacyStoreManagerGateway.createStoreOnLegacySystem(refreshedUnmanagedStore(store));
 
     return Response.ok(store).status(201).build();
   }
@@ -77,7 +78,7 @@ public class StoreResource {
     entity.name = updatedStore.name;
     entity.quantityProductsInStock = updatedStore.quantityProductsInStock;
 
-    legacyStoreManagerGateway.updateStoreOnLegacySystem(updatedStore);
+    legacyStoreManagerGateway.updateStoreOnLegacySystem(refreshedUnmanagedStore(entity));
 
     return entity;
   }
@@ -104,7 +105,7 @@ public class StoreResource {
       entity.quantityProductsInStock = updatedStore.quantityProductsInStock;
     }
 
-    legacyStoreManagerGateway.updateStoreOnLegacySystem(updatedStore);
+    legacyStoreManagerGateway.updateStoreOnLegacySystem(refreshedUnmanagedStore(entity));
 
     return entity;
   }
@@ -145,5 +146,19 @@ public class StoreResource {
 
       return Response.status(code).entity(exceptionJson).build();
     }
+  }
+
+  /**
+   * Returns an unmanaged Store object fully refreshed with latest changes.
+   * Unmanaged instance is suitable for passing downstream, to prevent inadvertent database changes being made.
+   */
+  private Store refreshedUnmanagedStore(Store store){
+    Panache.getEntityManager().flush();
+    Panache.getEntityManager().refresh(store);
+
+    Store unmanagedStore = new Store(store.name);
+    unmanagedStore.id = store.id;
+    unmanagedStore.quantityProductsInStock = store.quantityProductsInStock;
+    return unmanagedStore;
   }
 }
